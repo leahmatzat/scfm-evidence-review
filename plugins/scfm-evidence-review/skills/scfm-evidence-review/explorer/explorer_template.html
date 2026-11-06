@@ -1,0 +1,330 @@
+<title>scFM Evidence Explorer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+/* Layout: a task picker on top, one row per model below, a detail drawer that opens from the right (bottom sheet on phones). Same palette as the deck. */
+:root{
+  --bg:#f6f4ef; --surface:#ffffff; --sunk:#ecefee; --line:#d9dedf; --ink:#1f2a30; --muted:#4f5b63;
+  --accent:#2b5f8a; --accent-soft:#dce8f2; --warn:#a84f12; --warn-soft:#f6e4d6; --na:#7d878d;
+  --serif:'Source Serif 4', Georgia, serif; --sans:'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif; --mono:'IBM Plex Mono', Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141b1f; --surface:#1c252a; --sunk:#232e34; --line:#33424a; --ink:#e7ecee; --muted:#a9b6bc;
+  --accent:#8dbbe0; --accent-soft:#213a4f; --warn:#f0a76f; --warn-soft:#45291a; --na:#8b979d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141b1f; --surface:#1c252a; --sunk:#232e34; --line:#33424a; --ink:#e7ecee; --muted:#a9b6bc;
+  --accent:#8dbbe0; --accent-soft:#213a4f; --warn:#f0a76f; --warn-soft:#45291a; --na:#8b979d; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 56px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+.lede{color:var(--muted);max-width:70ch;margin:8px 0 0}
+.mockbar{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:var(--muted)}
+.mockbar b{color:var(--ink);font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.ask{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.fam{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.fam[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fam .n{color:var(--muted);margin-left:4px}
+.fam[aria-pressed="true"] .n{color:var(--bg);opacity:.75}
+.fam:focus-visible,.sc:focus-visible,.cardbtn:focus-visible,.close:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:13px;color:var(--muted);align-items:center}
+.legend .sc{cursor:default}
+.summary{font-size:14px;color:var(--muted);margin:0}
+.model{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mhead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.mname{font-family:var(--serif);font-size:22px;font-weight:600;margin:0}
+.msrc{font-size:13px;color:var(--muted)}
+.mtools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cardbtn{font:inherit;font-size:13px;font-weight:500;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:6px;padding:4px 10px;cursor:pointer}
+.kbadge{font:inherit;font-size:12px;font-weight:600;color:var(--ink);background:var(--surface);border:1px dashed var(--muted);border-radius:4px;padding:2px 8px;cursor:pointer}
+.kmini{display:inline-block;margin-top:3px;font-family:var(--sans);font-size:10.5px;font-weight:600;border:1px dashed var(--muted);border-radius:3px;padding:0 5px;color:var(--ink)}
+.alert{font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:2px 8px}
+.grid{width:100%;border-collapse:collapse;font-size:14px}
+.tablewrap{overflow-x:auto}
+.grid th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:bottom}
+.grid th small{display:block;font-weight:400;letter-spacing:0;text-transform:none}
+.grid td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.grid tr:last-child td{border-bottom:none}
+.task{min-width:180px;font-weight:500}
+.task span{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.modelwide{display:flex;flex-wrap:wrap;gap:8px 18px;padding:14px 20px;background:var(--sunk);font-size:13px;color:var(--muted);align-items:center}
+.modelwide .lbl{font-weight:600;color:var(--ink);margin-right:2px}
+.mw{display:inline-flex;gap:6px;align-items:center}
+/* score chip: number + word, color never carries meaning alone */
+.sc{font:inherit;display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;border-radius:6px;padding:3px 8px 3px 3px;cursor:pointer;background:var(--sunk);color:var(--ink);font-size:13px;white-space:nowrap;text-align:left}
+.sc .num{font-family:var(--mono);font-weight:500;font-size:12px;min-width:26px;height:20px;display:inline-grid;place-items:center;border-radius:4px;background:var(--surface);border:1px solid var(--line)}
+.sc.s2{background:var(--accent-soft)} .sc.s2 .num{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.sc.s0{background:var(--warn-soft)} .sc.s0 .num{color:var(--warn);border-color:var(--warn)}
+.sc.na{background:transparent;border:1px dashed var(--line);color:var(--na)} .sc.na .num{border-style:dashed;color:var(--na)}
+.sc.none{background:transparent;color:var(--na);cursor:default;padding-left:8px}
+.sc:hover:not(.none):not([disabled]){border-color:var(--ink)}
+.v{font-family:var(--mono);font-size:11px;color:var(--warn);margin-left:2px}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,15,18,.35);z-index:20}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--surface);border-left:1px solid var(--line);z-index:21;overflow-y:auto;
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(24px, env(safe-area-inset-right,0px)) calc(32px + env(safe-area-inset-bottom,0px)) 24px;display:flex;flex-direction:column;gap:18px}
+@media (max-width:640px){.drawer{top:auto;left:0;width:100%;max-height:85%;border-left:none;border-top:1px solid var(--line);border-radius:14px 14px 0 0;padding-left:max(20px, env(safe-area-inset-left,0px));padding-right:max(20px, env(safe-area-inset-right,0px))}}
+.dtop{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.close{font:inherit;font-size:13px;background:var(--sunk);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+.dq{font-family:var(--serif);font-size:22px;font-weight:600;line-height:1.25;margin:4px 0 0;text-wrap:balance}
+.dmeta{font-size:13px;color:var(--muted)}
+.sec h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.sec p{margin:0;max-width:65ch}
+.quote{font-family:var(--mono);font-size:12.5px;line-height:1.55;background:var(--sunk);border-radius:8px;padding:12px 14px;white-space:pre-wrap;word-break:break-word}
+.facts{display:grid;grid-template-columns:minmax(120px,170px) 1fr;gap:8px 16px;font-size:14px}
+.facts dt{color:var(--muted);font-weight:500}
+.facts dd{margin:0;min-width:0}
+.obs{display:flex;flex-direction:column;gap:10px;padding:0;margin:0;list-style:none}
+.obs li{border-left:3px solid var(--line);padding-left:12px}
+.contra li{border-left-color:var(--warn)}
+
+.views{display:flex;gap:4px;background:var(--sunk);border-radius:8px;padding:4px;width:max-content;max-width:100%}
+.view{font:inherit;font-size:14px;font-weight:500;border:none;background:none;color:var(--muted);border-radius:6px;padding:6px 14px;cursor:pointer}
+.view[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.view:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cmp{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.cmp h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0;padding:16px 20px 4px}
+.cmp .sub{margin:0;padding:0 20px 12px;font-size:13px;color:var(--muted)}
+.mx{border-collapse:separate;border-spacing:0;font-size:13.5px;width:100%}
+.mx th,.mx td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top;text-align:left}
+.mx thead th{font-size:12px;font-weight:600;color:var(--muted);vertical-align:bottom;border-top:none;white-space:normal;min-width:96px}
+.mx thead th small{display:block;font-weight:400}
+.mx th[scope="row"]{position:sticky;left:0;background:var(--surface);font-family:var(--serif);font-size:16px;font-weight:600;min-width:120px;z-index:1;border-right:1px solid var(--line)}
+.mx th[scope="row"] span{display:block;font-family:var(--sans);font-size:11.5px;font-weight:400;color:var(--muted)}
+.cnt{font:inherit;font-family:var(--mono);font-size:13px;min-width:34px;padding:3px 8px;border-radius:6px;border:1px solid var(--line);background:var(--accent-soft);color:var(--ink);cursor:pointer}
+.cnt:hover{border-color:var(--ink)} .cnt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dash{color:var(--na)}
+.dist{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.dist .sc{cursor:default;padding-right:6px;font-family:var(--mono);font-size:12px}
+.dist .sc .num{min-width:22px;height:18px}
+.ol{display:block;margin-top:6px;font-size:12px;color:var(--muted);line-height:1.4}
+.yes{font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:2px 8px;white-space:nowrap}
+footer{font-size:12.5px;color:var(--muted);max-width:80ch}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.exports{display:flex;flex-wrap:wrap;gap:8px}
+.ex{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
+.ex:hover{border-color:var(--muted)}
+@media print{.bar,.scrim,.drawer,.chips button[aria-pressed="false"]{display:none!important}body{background:#fff!important;color:#000}.wrap{max-width:none}.tablewrap,.cmp,.model{overflow:visible!important}.mx,.grid{font-size:9px}.mx th,.mx td{padding:4px 5px!important}.mx thead th,.mx th[scope="row"]{min-width:0!important;font-size:9px!important;position:static!important}.wrap{padding:0!important}tr,.model .mhead{break-inside:avoid}@page{size:landscape;margin:12mm}}
+@media (prefers-reduced-motion:no-preference){.drawer{animation:in .18s ease-out}@keyframes in{from{transform:translateX(16px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Single-cell foundation models · evidence audit</p>
+    <h1>Evidence Explorer</h1>
+    <p class="lede">Pick what you want to use a model for. Each model evaluated on it shows which standard checks its paper reported, task by task. Select any score to read the reason and the paper’s own words.</p>
+  </header>
+
+  <div class="mockbar">__META__</div>
+
+  <div class="bar">
+  <div class="views" role="group" aria-label="View">
+    <button class="view" data-view="task" aria-pressed="true">By task</button>
+    <button class="view" data-view="compare" aria-pressed="false">Compare models</button>
+  </div>
+  <div class="exports" role="group" aria-label="Save or export">
+    <button class="ex" data-ex="csv">Download scores (CSV)</button>
+    <button class="ex" data-ex="print">Print or save as PDF</button>
+  </div>
+  </div>
+
+  <div id="compare" hidden style="display:flex;flex-direction:column;gap:18px"></div>
+
+  <section class="panel" aria-labelledby="ask" id="taskpanel">
+    <p class="ask" id="ask">I want a model for…</p>
+    <div class="chips" id="fams" role="group" aria-label="Task family"></div>
+  </section>
+
+  <div class="legend" aria-label="How to read the scores">
+    <span class="sc s2"><span class="num">2</span>reported in full</span>
+    <span class="sc s1"><span class="num">1</span>in part</span>
+    <span class="sc s0"><span class="num">0</span>not reported</span>
+    <span class="sc na"><span class="num">n/a</span>doesn’t apply</span>
+    <span class="kbadge" style="cursor:default">Text-derived inputs</span><span>inputs include text read by a language model</span>
+    <span><span class="v">[V]</span> = not verified.</span>
+  </div>
+
+  <div id="taskview" style="display:flex;flex-direction:column;gap:18px">
+  <p class="summary" id="summary"></p>
+  <div id="models" style="display:flex;flex-direction:column;gap:18px"></div>
+  </div>
+
+  <footer>Every score comes from a review of the paper and its supplements with the scfm-evidence-review skill, with a pointer to the source. Built __BUILT__ from <code>__SOURCE__</code>.</footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="dq"></aside>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(function(){
+const DATA = JSON.parse(document.getElementById('data').textContent);
+const FAM = {perturbation_genetic:'Genetic perturbation', perturbation_chemical:'Chemical perturbation', perturbation_signaling:'Signaling perturbation',
+  reverse_perturbation:'Finding the perturbation', drug_response:'Drug response', annotation:'Cell-type annotation', integration:'Integration',
+  reference_mapping:'Reference mapping', zero_shot_embedding:'Zero-shot embedding', gene_programs:'Gene programs / networks', gene_level:'Gene-level prediction', denoising:'Denoising', other:'Other tasks'};
+const COL = {
+  simple_baseline:{name:'Simple baseline', q:'Does it beat something simple on this task?'},
+  input_dependence:{name:'Input check', q:'Does the output depend on real signal in the input?'},
+  training_data_overlap:{name:'Training overlap', q:'Was the test data kept out of the training data?'},
+  fair_test_number:{name:'Fair test', q:'Would you get this number on your own data?'},
+  pretraining_payoff:{name:'Pretraining payoff', q:'Does pretraining earn its keep?'},
+  unwanted_variation:{name:'Unwanted variation', q:'Is the result separated from batch, donor and lab effects?'},
+  prior_dependence:{name:'Prior dependence', q:'Does the injected biology actually matter?'},
+  explanation_check:{name:'Explanation check', q:'Was the model’s explanation of itself tested?'},
+  biological_validation:{name:'Bio. validation', q:'Was a claim about biology checked outside the model?'}
+};
+const PER_TASK = ['simple_baseline','input_dependence','training_data_overlap','fair_test_number'];
+const MODEL_WIDE = ['pretraining_payoff','unwanted_variation','prior_dependence','explanation_check','biological_validation'];
+const MEANING = {'2':'Reported in full','1':'Reported in part','0':'Not reported','n/a':'Doesn’t apply to this model'};
+const T1 = [['class','Class'],['knowledge_source','Knowledge from'],['architecture','Architecture'],['training_objective','Training'],['context_structure','Context'],['scale','Scale'],['gene_coverage','Genes it sees'],
+  ['data_modality','Data'],['organism','Organism'],['availability_weights','Weights'],['availability_inference_code','Code'],['availability_licence','Licence'],
+  ['run_to_run_spread','Run-to-run spread'],['what_was_held_out','Held out'],['independent_evaluations','Independent evaluations']];
+
+const fam = t => t.split(':')[0];
+const isText = m => /^\s*Sources:[^.]*\btext\b/i.test(((DATA[m].t1||{}).knowledge_source||{}).v||'');
+const TEXT_NOTE = "This model's inputs include text about genes, read by a language model. That text may already describe the experiments the model is tested on, and there is no way to check.";
+const pretty = t => { const q = t.split(':')[1]; return q ? q.replace(/_/g,' ') : 'main evaluation'; };
+const outcome = v => { const m = /^\s*Outcome:\s*([a-z ]+?)(\s*\[V\])?\s*(?:[.;,(]|$)/i.exec(v||''); return m ? {w:m[1].trim(), v:!!m[2]} : null; };
+const kind = v => { const m = /^\s*Kind:\s*([^.]+)/i.exec(v||''); return m ? m[1].trim() : null; };
+const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cls = s => s==='2'?'s2':s==='1'?'s1':s==='0'?'s0':'na';
+
+// index rows
+const idx = {};
+for (const [m,d] of Object.entries(DATA)) {
+  idx[m] = {};
+  for (const r of d.t2) (idx[m][r.f] ??= {})[r.t.toLowerCase()] = r;
+}
+const famCount = {};
+for (const [m,d] of Object.entries(DATA)) {
+  const fams = new Set(d.t2.filter(r=>PER_TASK.includes(r.f) && r.t!=='all').map(r=>fam(r.t)));
+  fams.forEach(f => famCount[f] = (famCount[f]||0)+1);
+}
+const order = Object.keys(FAM).filter(f => famCount[f]);
+let current = (location.hash||'').slice(1), view = current==='compare' ? 'compare' : 'task';
+if (!famCount[current]) current = 'perturbation_genetic';
+const evalCount = (m,f) => new Set(DATA[m].t2.filter(r=>PER_TASK.includes(r.f) && r.t!=='all' && fam(r.t)===f).map(r=>r.t.toLowerCase())).size;
+const rowsOf = (m,f) => DATA[m].t2.filter(r => r.f===f && r.t!=='all');
+function dist(m,f){
+  const rs = rowsOf(m,f); if (!rs.length) return '<span class="dash">—</span>';
+  if (rs.every(r=>r.s==='n/a')) return '<span class="sc na"><span class="num">n/a</span></span>';
+  const c = {'2':0,'1':0,'0':0}; rs.forEach(r => { if (c[r.s]!==undefined) c[r.s]++; });
+  let h = '<div class="dist">' + ['2','1','0'].filter(k=>c[k]).map(k=>`<span class="sc ${cls(k)}" title="${c[k]} task(s) scored ${k}"><span class="num">${k}</span>×${c[k]}</span>`).join('') + '</div>';
+  if (f==='simple_baseline'){ const o={}; rs.forEach(r=>{const x=outcome(r.v); if(x) o[x.w]=(o[x.w]||0)+1;}); h += `<span class="ol">${['beat','mixed','tied','lost','not reported','none'].filter(k=>o[k]).map(k=>`${k} ${o[k]}`).join(' · ')}</span>`; }
+  if (f==='fair_test_number'){ const o={}; rs.filter(r=>r.s==='0').forEach(r=>{const k=kind(r.v)||'?'; o[k]=(o[k]||0)+1;}); const t=Object.entries(o).map(([k,n])=>`${k} ${n}`).join(' · '); if(t) h += `<span class="ol">0s: ${esc(t)}</span>`; }
+  if (f==='input_dependence'){ const k=rs.filter(r=>r.s!=='0'&&r.s!=='n/a').length; h += `<span class="ol">checked on ${k} of ${rs.length} tasks</span>`; }
+  return h;
+}
+function renderCompare(){
+  const ms = Object.keys(DATA);
+  const fams = order;
+  const head1 = fams.map(f=>`<th scope="col">${FAM[f]}</th>`).join('');
+  const body1 = ms.map(m=>`<tr><th scope="row">${esc(m)}<span>${esc(DATA[m].source.split('(')[0].trim())}</span>${isText(m)?`<span class="kmini" title="${esc(TEXT_NOTE)}">Text-derived inputs</span>`:''}</th>${fams.map(f=>{const n=evalCount(m,f); return `<td>${n?`<button class="cnt" data-go="${f}" data-gm="${esc(m)}" aria-label="${n} ${FAM[f]} evaluations: open">${n}</button>`:'<span class="dash">—</span>'}</td>`;}).join('')}</tr>`).join('');
+  const t1v = (m,k) => { const v = (DATA[m].t1[k]||{}).v||''; return esc(v.split(/[:;(\[]/)[0].trim()); };
+  const head2 = PER_TASK.map(f=>`<th scope="col">${COL[f].name}<small>across tasks</small></th>`).join('') + MODEL_WIDE.map(f=>`<th scope="col">${COL[f].name}</th>`).join('') + '<th scope="col">Run-to-run spread<small>Table 1 fact</small></th><th scope="col">Claim contradicted</th>';
+  const body2 = ms.map(m=>{
+    const c = DATA[m].flags.claim_contradicted, contra = c && c.v.trim() && !/^none/i.test(c.v.trim());
+    return `<tr><th scope="row">${esc(m)}</th>${PER_TASK.map(f=>`<td>${dist(m,f)}</td>`).join('')}${MODEL_WIDE.map(f=>`<td>${chip(m,f,'all',(idx[m][f]||{})['all'],true)}</td>`).join('')}<td>${t1v(m,'run_to_run_spread')||'<span class="dash">—</span>'}</td><td>${contra?`<button class="cardbtn" data-card="${esc(m)}">Yes · read</button>`:'<span class="dash">None found</span>'}</td></tr>`;}).join('');
+  document.getElementById('compare').innerHTML = `
+  <section class="cmp"><h2>What each model was evaluated on</h2><p class="sub">Number of separate evaluations the paper reports in each task family. Select a number to open that task view.</p>
+    <div class="tablewrap"><table class="mx"><thead><tr><th scope="col">Model</th>${head1}</tr></thead><tbody>${body1}</tbody></table></div></section>
+  <section class="cmp"><h2>Checks reported, side by side</h2><p class="sub">Per-task checks count how many of a model's tasks scored 2, 1 or 0. Whole-model checks are one score each; select one to read why.</p>
+    <div class="tablewrap"><table class="mx"><thead><tr><th scope="col">Model</th>${head2}</tr></thead><tbody>${body2}</tbody></table></div></section>`;
+}
+
+const SHORT = {'2':'full','1':'part','0':'not reported','n/a':''};
+function chip(m, f, t, r, compact){
+  if (!r) return `<span class="sc none" aria-label="no row">—</span>`;
+  let word = '';
+  if (f==='simple_baseline'){ const o = outcome(r.v); if (o) word = o.w + (o.v?' <span class="v">[V]</span>':''); }
+  else if (f==='fair_test_number' && r.s==='0'){ const k = kind(r.v); if (k) word = k; }
+  if (!word) word = compact ? SHORT[r.s] : (MEANING[r.s]||'').toLowerCase();
+  if (/unverified/.test(r.fl||'') && !/\[V\]/.test(word)) word += ' <span class="v">[V]</span>';
+  return `<button class="sc ${cls(r.s)}" data-m="${esc(m)}" data-f="${f}" data-t="${esc(t)}"><span class="num">${esc(r.s)}</span>${word}</button>`;
+}
+
+function render(){
+  document.querySelectorAll('.view').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.view===view)));
+  const isC = view==='compare';
+  document.getElementById('compare').hidden = !isC; document.getElementById('taskpanel').hidden = isC; document.getElementById('taskview').hidden = isC;
+  if (isC){ renderCompare(); return; }
+  document.getElementById('fams').innerHTML = order.map(f =>
+    `<button class="fam" aria-pressed="${f===current}" data-fam="${f}">${FAM[f]}<span class="n">${famCount[f]}</span></button>`).join('');
+  const models = Object.keys(DATA).filter(m => DATA[m].t2.some(r => PER_TASK.includes(r.f) && r.t!=='all' && fam(r.t)===current));
+  document.getElementById('summary').textContent = `${models.length} of ${Object.keys(DATA).length} models in this mockup were evaluated on ${FAM[current].toLowerCase()}.`;
+  document.getElementById('models').innerHTML = models.map(m => {
+    const d = DATA[m];
+    const tasks = [...new Set(d.t2.filter(r=>PER_TASK.includes(r.f) && r.t!=='all' && fam(r.t)===current).map(r=>r.t.toLowerCase()))];
+    const contra = d.flags.claim_contradicted && d.flags.claim_contradicted.v.trim() && !/^none/i.test(d.flags.claim_contradicted.v.trim());
+    const rows = tasks.map(t => `<tr><td class="task">${esc(pretty(t))}<span>${esc(FAM[fam(t)]||fam(t))}</span></td>${PER_TASK.map(f=>`<td>${chip(m,f,t,(idx[m][f]||{})[t])}</td>`).join('')}</tr>`).join('');
+    const wide = MODEL_WIDE.map(f => `<span class="mw">${COL[f].name} ${chip(m,f,'all',(idx[m][f]||{})['all'])}</span>`).join('');
+    return `<article class="model">
+      <div class="mhead"><div><h2 class="mname">${esc(m)}</h2><div class="msrc">${esc(d.source)} · ${d.peer==='yes'?'peer reviewed':'not peer reviewed'}</div></div>
+        <div class="mtools">${isText(m)?`<button class="kbadge" data-card="${esc(m)}" title="${esc(TEXT_NOTE)}">Text-derived inputs</button>`:''}${contra?'<span class="alert">Claim contradicted by its own data</span>':''}<button class="cardbtn" data-card="${esc(m)}">Model card</button></div></div>
+      <div class="tablewrap"><table class="grid"><thead><tr><th>Task</th>${PER_TASK.map(f=>`<th>${COL[f].name}<small>${COL[f].q}</small></th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="modelwide"><span class="lbl">Whole model</span>${wide}</div>
+    </article>`;
+  }).join('');
+}
+
+const drawer = document.getElementById('drawer'), scrim = document.getElementById('scrim');
+let lastFocus = null;
+function open(html){ lastFocus = document.activeElement; drawer.innerHTML = html; drawer.hidden = false; scrim.hidden = false; drawer.querySelector('.close').focus(); }
+function shut(){ drawer.hidden = true; scrim.hidden = true; if (lastFocus) lastFocus.focus(); }
+function head(eyebrow, title, meta){ return `<div class="dtop"><div><p class="eyebrow">${eyebrow}</p><h2 class="dq" id="dq">${title}</h2>${meta?`<div class="dmeta">${meta}</div>`:''}</div><button class="close">Close</button></div>`; }
+
+function scoreDetail(m,f,t){
+  const r = idx[m][f][t];
+  const o = f==='simple_baseline' ? outcome(r.v) : null, k = f==='fair_test_number' && r.s==='0' ? kind(r.v) : null;
+  const pts = (r.p||'').split(/\s*;\s*(?=[A-Z])/).filter(Boolean);
+  open(head(`${esc(m)} · ${esc(COL[f].name)}${t!=='all'?' · '+esc(pretty(t)):''}`, esc(COL[f].q),
+      `<span class="sc ${cls(r.s)}" style="cursor:default"><span class="num">${esc(r.s)}</span>${MEANING[r.s]||''}</span>${o?` · Outcome: <b>${esc(o.w)}</b>`:''}${k?` · Kind: <b>${esc(k)}</b>`:''}`) +
+    `<div class="sec"><h3>What the review found</h3><p>${esc(r.v)}</p></div>
+     <div class="sec"><h3>Where in the paper</h3>${pts.map(p=>`<div class="quote">${esc(p)}</div>`).join('<div style="height:8px"></div>')||'<p>—</p>'}</div>
+     ${r.fl?`<div class="sec"><h3>Flags</h3><p>${esc(r.fl)}</p></div>`:''}`);
+}
+
+function card(m){
+  const d = DATA[m];
+  const split = s => (s||'').split(/\s*\|\s*(?=Observation:)/).map(x=>x.replace(/^Observation:\s*/,'')).filter(x=>x.trim());
+  const contra = d.flags.claim_contradicted ? d.flags.claim_contradicted.v : '';
+  const obs = d.flags.observations ? split(d.flags.observations.v) : [];
+  open(head('Model card', esc(m), `${esc(d.source)} · ${d.peer==='yes'?'peer reviewed':'not peer reviewed'}`) +
+    (isText(m)?`<div class="sec"><h3>Text-derived inputs</h3><p>${esc(TEXT_NOTE)}</p></div>`:'') + `<div class="sec"><h3>What the model is</h3><dl class="facts">${T1.filter(([k])=>d.t1[k]).map(([k,l])=>`<dt>${l}</dt><dd>${esc(d.t1[k].v)}</dd>`).join('')}</dl></div>
+     ${contra && !/^none/i.test(contra.trim())?`<div class="sec"><h3>Claims contradicted by the paper’s own data</h3><ul class="obs contra"><li>${esc(contra)}</li></ul></div>`:''}
+     ${obs.length?`<div class="sec"><h3>Reviewer observations</h3><ul class="obs">${obs.map(o=>`<li>${esc(o)}</li>`).join('')}</ul></div>`:''}
+     ${d.flags.version_difference && d.flags.version_difference.v.trim()?`<div class="sec"><h3>Version differences</h3><p>${esc(d.flags.version_difference.v)}</p></div>`:''}`);
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) { if (e.target===scrim) shut(); return; }
+  if (b.dataset.view){ view = b.dataset.view; try{ history.replaceState(null,'','#'+(view==='compare'?'compare':current)); }catch(_){ } render(); }
+  else if (b.dataset.go){ view='task'; current=b.dataset.go; try{ history.replaceState(null,'','#'+current); }catch(_){ } render(); const el=[...document.querySelectorAll('.mname')].find(x=>x.textContent===b.dataset.gm); if(el) el.scrollIntoView({block:'start'}); }
+  else if (b.dataset.fam){ current = b.dataset.fam; try{ history.replaceState(null,'','#'+current); }catch(_){ } render(); }
+  else if (b.dataset.f && b.dataset.m){ scoreDetail(b.dataset.m, b.dataset.f, b.dataset.t); }
+  else if (b.dataset.card){ card(b.dataset.card); }
+  else if (b.classList.contains('close')){ shut(); }
+  else if (b.dataset.ex==='print'){ shut(); window.print(); }
+  else if (b.dataset.ex==='csv'){
+    const q = x => '"'+String(x??'').replace(/"/g,'""')+'"';
+    const L = [['model','source_scored','table','field','task','score','value','pointer','flags'].join(',')];
+    for (const [m,d] of Object.entries(DATA)){
+      for (const [k,o] of Object.entries(d.t1)) L.push([m,d.source,'T1',k,'all','',o.v,o.p,''].map(q).join(','));
+      for (const r of d.t2) L.push([m,d.source,'T2',r.f,r.t,r.s,r.v,r.p,r.fl].map(q).join(','));
+      for (const [k,o] of Object.entries(d.flags)) L.push([m,d.source,'flag',k,'all','',o.v,o.p,''].map(q).join(','));
+    }
+    try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([L.join('\n')],{type:'text/csv'})); a.download = 'evidence_scores.csv'; document.body.appendChild(a); a.click(); a.remove(); }
+    catch(_){ b.textContent = 'Download not available here'; }
+  }
+});
+document.addEventListener('keydown', e => { if (e.key==='Escape' && !drawer.hidden) shut(); });
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (h==='compare'){ view='compare'; render(); } else if (famCount[h]) { view='task'; current = h; render(); } });
+render();
+})();
+</script>

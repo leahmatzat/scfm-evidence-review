@@ -1,0 +1,9 @@
+{
+  "title": "scfm-evidence-review: a rubric and Claude skill for reviewing evidence in single-cell foundation model papers",
+  "upload_type": "software",
+  "description": "A versioned rubric and Claude skill that records which standard checks a single-cell foundation model paper reported, task by task, each backed by a pointer and a quote from the paper. Outputs a fixed-format CSV that stacks across models and an optional offline Evidence Explorer page.",
+  "creators": [{"name": "Matzat, Leah"}],
+  "license": "MIT",
+  "keywords": ["single-cell", "foundation models", "evidence review", "benchmarking", "reproducibility", "Claude skill"],
+  "version": "1.6.0"
+}

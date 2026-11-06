@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this skill or its rubric, please cite it as below."
+title: "scfm-evidence-review: a rubric and Claude skill for reviewing evidence in single-cell foundation model papers"
+type: software
+authors:
+  - family-names: Matzat
+    given-names: Leah
+version: 1.6.0
+date-released: 2026-11-06
+license: MIT
+repository-code: "https://github.com/leahmatzat/scfm-evidence-review"
+keywords:
+  - single-cell
+  - foundation models
+  - evidence review
+  - benchmarking
+  - reproducibility
