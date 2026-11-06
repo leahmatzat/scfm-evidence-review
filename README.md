@@ -1,5 +1,7 @@
 # scfm-evidence-review
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23998812.svg)](https://doi.org/10.5281/zenodo.23998812)
+
 A Claude skill for reviewing the evidence in single-cell foundation model papers with a fixed, versioned rubric. For each paper it records which standard checks were reported, task by task, each backed by a pointer and a quote, and writes a CSV that stacks across models. An optional Evidence Explorer turns those CSVs into one offline HTML page.
 
 The rubric (v1.6) was developed on twelve published models (UCE, Geneformer, scGPT, scFoundation, CellPLM, SCimilarity, CellFM, STATE, X-Cell, GEARS, CPA, CellOT) and tested on two it was not built from (TranscriptFormer, Scouter). It measures what a paper reported, not whether its results are right.
@@ -35,7 +37,7 @@ Open an issue: a rubric rule that doesn't fit a paper, a score you think is wron
 
 ## Cite
 
-See `CITATION.cff`, or the Zenodo record linked from the latest release.
+Cite all versions with the concept DOI [10.5281/zenodo.23998812](https://doi.org/10.5281/zenodo.23998812), which always resolves to the latest release. To cite the exact version you used, take its DOI from the Zenodo record (v1.6.0: [10.5281/zenodo.23998813](https://doi.org/10.5281/zenodo.23998813)). `CITATION.cff` has the details.
 
 ## Licence
 

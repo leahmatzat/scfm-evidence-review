@@ -6,6 +6,14 @@ authors:
   - family-names: Matzat
     given-names: Leah
 version: 1.6.0
+doi: 10.5281/zenodo.23998812
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23998812
+    description: Concept DOI (all versions, resolves to the latest)
+  - type: doi
+    value: 10.5281/zenodo.23998813
+    description: Version DOI for v1.6.0
 date-released: 2026-11-06
 license: MIT
 repository-code: "https://github.com/leahmatzat/scfm-evidence-review"
