@@ -9,6 +9,9 @@
   },
   "homepage": "https://github.com/leahmatzat/scfm-evidence-review",
   "repository": "https://github.com/leahmatzat/scfm-evidence-review",
+  "documentationUrl": "https://github.com/leahmatzat/scfm-evidence-review/blob/main/plugins/scfm-evidence-review/README.md",
+  "supportUrl": "https://github.com/leahmatzat/scfm-evidence-review/issues",
+  "privacyPolicyUrl": "https://github.com/leahmatzat/scfm-evidence-review/blob/main/plugins/scfm-evidence-review/README.md#what-it-reads-runs-and-sends",
   "license": "MIT",
   "keywords": ["single-cell", "foundation-models", "evidence-review", "benchmarking", "perturbation", "bioinformatics", "reproducibility"]
 }
