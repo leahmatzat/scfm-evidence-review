@@ -39,7 +39,7 @@ Open an issue: a rubric rule that doesn't fit a paper, a score you think is wron
 
 ## Cite
 
-Cite all versions with the concept DOI [10.5281/zenodo.23998812](https://doi.org/10.5281/zenodo.23998812), which always resolves to the latest release. To cite the exact version you used, take its DOI from the Zenodo record (v1.6.0: [10.5281/zenodo.23998813](https://doi.org/10.5281/zenodo.23998813)). `CITATION.cff` has the details.
+Cite all versions with the concept DOI [10.5281/zenodo.23998812](https://doi.org/10.5281/zenodo.23998812), which always resolves to the latest release. To cite the exact version you used, take its DOI from the Zenodo record (v1.7.1: [10.5281/zenodo.24409849](https://doi.org/10.5281/zenodo.24409849)). `CITATION.cff` has the details.
 
 ## Licence
 
