@@ -2,7 +2,7 @@
 
 Review the evidence in a single-cell foundation model paper the same way every time. Give Claude a paper (and its supplements), and the skill records which standard checks the paper reported, task by task, each backed by a pointer and a short quote from the paper.
 
-It measures **what was reported**, using a fixed rubric (v1.6). It does not rerun models or judge whether results are true.
+It measures **what was reported**, using a fixed rubric (v1.7). It does not rerun models or judge whether results are true.
 
 ## What you get
 

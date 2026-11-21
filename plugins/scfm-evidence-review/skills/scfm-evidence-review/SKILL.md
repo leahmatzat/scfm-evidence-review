@@ -1,9 +1,9 @@
 ---
 name: scfm-evidence-review
-description: Use when asked to review, audit or score the evidence in a single-cell foundation model paper (or a similar bio-AI model paper — cell embedding, integration, perturbation prediction). Applies the scFM audit rubric v1.6 and writes a fixed-format CSV that concatenates across models.
+description: Use when asked to review, audit or score the evidence in a single-cell foundation model paper (or a similar bio-AI model paper — cell embedding, integration, perturbation prediction). Applies the scFM audit rubric v1.7 and writes a fixed-format CSV that concatenates across models.
 ---
 
-# scFM evidence review — rubric v1.6
+# scFM evidence review — rubric v1.7
 
 Use this to review one paper about a single-cell foundation model, or a similar biological AI model (perturbation prediction, cell embedding, integration). The output is one Table 1 row, one Table 2 row, and a short list of flags, each backed by a quote from the paper.
 
@@ -81,14 +81,28 @@ Score each column 2 / 1 / 0 / n/a. Fill the recorded fields. Column names are re
 
 ### Simple baseline (V1)
 *Reader's question: Does it beat something simple — on the task I care about?*
-- **Fact:** on this task, was a simple, non-deep baseline run (linear / additive, mean-shift, PCA, raw or HVG expression, logistic regression / SVM, tree ensembles such as random forest or XGBoost, Harmony-type)? Any non-deep method counts.
+- **Fact:** on this task, was a simple, non-deep baseline run (linear / additive, mean-shift, PCA, raw or HVG expression, logistic regression / SVM, tree ensembles such as random forest or XGBoost, Harmony-type, transfer of measured responses from other cell lines or contexts)? Any non-deep method counts, including one that sits inside a larger pipeline: averaging or reweighting effects measured elsewhere is simple as long as no learned deep representation is involved.
 - **Score every evaluated task separately**, like Input dependence, Training-data overlap and Fair test number.
 - **2** a simple non-deep baseline was run on this task · **1** only a trivial reference on this task (no-change / identity, random subset, random classifier, chance) · **0** deep comparators only, or no comparator.
 - **Outcome (required, per task):** start `value` with `Outcome:` and one of — `beat` (the model is better than the best simple baseline on the paper's headline metric for this task) · `tied` (within the paper's reported spread, or described as comparable) · `lost` (the simple baseline is better) · `mixed` (better on some metrics or datasets, worse on others — say which) · `not reported` (run but numbers not shown) · `none` (score 0). Judge the outcome against the **strongest baseline run on the task, trivial references included** (if the no-change prediction beats the model, the outcome is `lost` even when a simple baseline lost too). Use the paper's own numbers. **Look for them in source data files and supplementary tables before relying on the authors' description** — baseline numbers are often there even when the figure is only an image. If the numbers exist only in a figure image, record the outcome from the text and mark it `[V]`.
-- **Record:** baseline names · whether baselines were tuned (matched / defaults / unstated) · field-standard baseline flag: did the paper run the baseline the field had established as necessary for this task by its publication date? (This is how a paper gets credit for meeting the standard of its time; it is a note, not part of the score.)
+- **Record:** baseline names · whether baselines were tuned (matched / defaults / unstated) · field-standard baseline: look the task up in the register below. Write `yes` if the paper ran what the register lists for its task, `no` if it did not, or `no register entry` if the task has none. Judge against the paper's first preprint date: an entry counts only if its date is earlier. This is how a paper gets credit for meeting the standard of its time; it is a note, not part of the score.
 - Chance-level references count here (score 1), not in Input dependence. **A chance line drawn on a plot counts** when it is labelled and plotted against the model's result (e.g. AUC = 0.5 on the model's ROC panel), even if the text never discusses it.
 - **A baseline built on a pretrained deep model's features is deep**, even when it needs no training of its own (e.g. averaging frozen protein-language-model vectors over a cell's expressed genes). "Simple" means no learned deep representation anywhere in the baseline.
 - **A reference used to define or select what is being evaluated is not a comparison.** If the candidates are defined as those that beat the reference (e.g. genes kept because they shift cells more than random genes do), they beat it by construction: score **0**, `Outcome: none`, and say why in the value.
+
+### Field-standard baseline register
+What the field expected each task to be compared against, from the date the expectation became public. Use it only for the field-standard note under Simple baseline; it never changes a score. An entry is added only with a source; a task with no entry gets `no register entry`, not a judgment.
+
+| Task | Simple (non-deep) baselines expected | Standard deep comparator | Expected from | Source |
+|---|---|---|---|---|
+| `annotation` | SVM or logistic regression on expression | — | May 2019 (preprint); *Genome Biology* Sept 2019 | Abdelaal et al. |
+| `integration` | Unintegrated HVG/PCA as the reference; Harmony | scVI | May 2020 (preprint); *Nature Methods* 2022 | Luecken et al. (scIB) |
+| `zero_shot_embedding` | HVG (about 2,000 genes); Harmony | scVI | Oct 2023 (preprint); *Genome Biology* Apr 2025 | Kedzierska et al. |
+| `perturbation_genetic`, unseen perturbations | Mean of training perturbations or no-change; additive model for combinations; linear model | — | Sept 2024 (preprint); *Nature Methods* 2025 | Ahlmann-Eltze, Huber & Anders |
+| `perturbation_genetic`, unseen cell context | Context mean; transfer of measured responses from other cell lines | — | Dec 2025 | Virtual Cell Challenge 2025 wrap-up (Arc Institute); reinforced by VCC 2026 |
+| Perturbation metrics, any task above | Replicate (noise) ceiling reported alongside the floor | — | Nov 2026 | Virtual Cell Challenge 2026 scoring (cell-eval2: 0 = mean-response baseline, 1 = replicate split) |
+
+For the ceiling row, record in the Simple baseline value: ceiling reported yes / no; kind (cell split · guide or replicate split · batch or external replicate · not stated); matched to the model's metric and test set yes / no. Never compare ceiling values across papers: how a ceiling is computed changes its value.
 
 ### Input dependence (V2)
 *Reader's question: Does the output depend on real signal in the input?*
@@ -204,7 +218,7 @@ run_id,rubric_version,run_date,scorer,model,source_scored,peer_reviewed,table,fi
 | Column | What goes in it |
 |---|---|
 | run_id | `<model>_<YYYY-MM-DD>` — same as the file name |
-| rubric_version | `v1.6` |
+| rubric_version | `v1.7` |
 | run_date | YYYY-MM-DD |
 | scorer | who ran it — the AI model name and version (e.g. `claude-opus-5-5`) or a person's initials |
 | model | the model being reviewed, spelled as in the field list below |
@@ -230,11 +244,11 @@ run_id,rubric_version,run_date,scorer,model,source_scored,peer_reviewed,table,fi
 
 **Example rows** *(a made-up model, to show the format only)*
 ```
-"ExampleFM_2026-10-06","v1.6","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","pretraining_payoff","all","1","Arm exists but model size also changes: the from-scratch arm is smaller. Scope: 2 of 4 tasks.","Journal X 2025 · Suppl. Note 3 · ""the from-scratch model has 4 layers""",""
-"ExampleFM_2026-10-06","v1.6","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","fair_test_number","annotation","2","Genes chosen by presence in all datasets; hyperparameters chosen on a separate validation split. No test labels used.","Journal X 2025 · Methods · ""selected on the validation set""",""
-"ExampleFM_2026-10-06","v1.6","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","simple_baseline","integration","2","Outcome: tied. PCA on HVGs run; overall score 0.61 vs ExampleFM 0.62, within the reported SD. Baselines at defaults.","Journal X 2025 · Suppl. Table 4 · ""PCA (HVG)""",""
-"ExampleFM_2026-10-06","v1.6","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","fair_test_number","perturbation_genetic","0","Kind: features. HVGs computed on the full dataset, including held-out perturbed cells.","Journal X 2025 · Methods · ""top 5,000 highly variable genes""",""
-"ExampleFM_2026-10-06","v1.6","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","flag","version_difference","all","","Published version adds an ablation absent from the preprint.","bioRxiv v2 vs Journal X 2025",""
+"ExampleFM_2026-10-06","v1.7","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","pretraining_payoff","all","1","Arm exists but model size also changes: the from-scratch arm is smaller. Scope: 2 of 4 tasks.","Journal X 2025 · Suppl. Note 3 · ""the from-scratch model has 4 layers""",""
+"ExampleFM_2026-10-06","v1.7","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","fair_test_number","annotation","2","Genes chosen by presence in all datasets; hyperparameters chosen on a separate validation split. No test labels used.","Journal X 2025 · Methods · ""selected on the validation set""",""
+"ExampleFM_2026-10-06","v1.7","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","simple_baseline","integration","2","Outcome: tied. PCA on HVGs run; overall score 0.61 vs ExampleFM 0.62, within the reported SD. Baselines at defaults.","Journal X 2025 · Suppl. Table 4 · ""PCA (HVG)""",""
+"ExampleFM_2026-10-06","v1.7","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","T2","fair_test_number","perturbation_genetic","0","Kind: features. HVGs computed on the full dataset, including held-out perturbed cells.","Journal X 2025 · Methods · ""top 5,000 highly variable genes""",""
+"ExampleFM_2026-10-06","v1.7","2026-10-06","claude-opus-5-5","ExampleFM","Journal X 2025","yes","flag","version_difference","all","","Published version adds an ablation absent from the preprint.","bioRxiv v2 vs Journal X 2025",""
 ```
 *(Examples show the format only. Do not copy their content.)*
 

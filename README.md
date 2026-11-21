@@ -4,7 +4,7 @@
 
 A Claude skill for reviewing the evidence in single-cell foundation model papers with a fixed, versioned rubric. For each paper it records which standard checks were reported, task by task, each backed by a pointer and a quote, and writes a CSV that stacks across models. An optional Evidence Explorer turns those CSVs into one offline HTML page.
 
-The rubric (v1.6) was developed on twelve published models (UCE, Geneformer, scGPT, scFoundation, CellPLM, SCimilarity, CellFM, STATE, X-Cell, GEARS, CPA, CellOT) and tested on two it was not built from (TranscriptFormer, Scouter). It measures what a paper reported, not whether its results are right.
+The rubric (v1.7) was developed on twelve published models (UCE, Geneformer, scGPT, scFoundation, CellPLM, SCimilarity, CellFM, STATE, X-Cell, GEARS, CPA, CellOT) and tested on two it was not built from (TranscriptFormer, Scouter). It measures what a paper reported, not whether its results are right.
 
 ## Install
 
@@ -29,7 +29,7 @@ See [`plugins/scfm-evidence-review/README.md`](plugins/scfm-evidence-review/READ
 
 ## Versions
 
-The rubric version is in every CSV row (`rubric_version`). Releases follow it: `v1.6.0` is rubric v1.6. Each GitHub release is archived on Zenodo with its own DOI.
+The rubric version is in every CSV row (`rubric_version`). Releases follow it: `v1.7.0` is rubric v1.7. Each GitHub release is archived on Zenodo with its own DOI.
 
 ## Corrections and suggestions
 

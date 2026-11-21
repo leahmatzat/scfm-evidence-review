@@ -1,7 +1,7 @@
 {
   "name": "scfm-evidence-review",
   "displayName": "scFM Evidence Review",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Review the evidence in a single-cell foundation model paper with a fixed rubric: which standard checks the paper reported, task by task, each backed by a quote. Writes a CSV that stacks across models and can build an offline Evidence Explorer page.",
   "author": {
     "name": "Leah Matzat",
@@ -13,5 +13,13 @@
   "supportUrl": "https://github.com/leahmatzat/scfm-evidence-review/issues",
   "privacyPolicyUrl": "https://github.com/leahmatzat/scfm-evidence-review/blob/main/plugins/scfm-evidence-review/README.md#what-it-reads-runs-and-sends",
   "license": "MIT",
-  "keywords": ["single-cell", "foundation-models", "evidence-review", "benchmarking", "perturbation", "bioinformatics", "reproducibility"]
+  "keywords": [
+    "single-cell",
+    "foundation-models",
+    "evidence-review",
+    "benchmarking",
+    "perturbation",
+    "bioinformatics",
+    "reproducibility"
+  ]
 }

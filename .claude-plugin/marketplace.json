@@ -12,7 +12,7 @@
       "name": "scfm-evidence-review",
       "source": "./plugins/scfm-evidence-review",
       "description": "Review the evidence in a single-cell foundation model paper with a fixed rubric and build an offline Evidence Explorer.",
-      "version": "1.6.0"
+      "version": "1.7.0"
     }
   ]
 }
