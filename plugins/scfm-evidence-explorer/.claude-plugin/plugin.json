@@ -1,0 +1,14 @@
+{
+  "name": "scfm-evidence-explorer",
+  "displayName": "scFM Evidence Explorer",
+  "version": "1.7.1",
+  "description": "Companion to scfm-evidence-review: turns your scfm-evidence-review CSVs into one self-contained, offline HTML page that shows every scored model by task and side by side.",
+  "author": {
+    "name": "Leah Matzat",
+    "url": "https://github.com/leahmatzat"
+  },
+  "homepage": "https://github.com/leahmatzat/scfm-evidence-review",
+  "repository": "https://github.com/leahmatzat/scfm-evidence-review",
+  "license": "MIT",
+  "keywords": ["single-cell", "foundation-models", "evidence-review", "visualization", "bioinformatics"]
+}

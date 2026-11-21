@@ -11,8 +11,14 @@
     {
       "name": "scfm-evidence-review",
       "source": "./plugins/scfm-evidence-review",
-      "description": "Review the evidence in a single-cell foundation model paper with a fixed rubric and build an offline Evidence Explorer.",
-      "version": "1.7.0"
+      "description": "Review the evidence in a single-cell foundation model paper with a fixed rubric.",
+      "version": "1.7.1"
+    },
+    {
+      "name": "scfm-evidence-explorer",
+      "source": "./plugins/scfm-evidence-explorer",
+      "description": "Companion to scfm-evidence-review: build an offline Evidence Explorer page from your review CSVs.",
+      "version": "1.7.1"
     }
   ]
 }

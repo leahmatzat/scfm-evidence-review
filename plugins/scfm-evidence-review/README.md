@@ -10,14 +10,15 @@ It measures **what was reported**, using a fixed rubric (v1.7). It does not reru
 - **Table 1: what the model is.** Facts such as class, architecture, gene coverage, where its knowledge comes from (measured expression, protein sequence, curated knowledge, or text read by a language model), availability of weights and code, what was held out, and run-to-run spread.
 - **Table 2: what the paper reported**, scored 2 / 1 / 0 / n/a on nine checks: simple baseline, input dependence, pretraining payoff, unwanted variation, prior dependence, training-data overlap, fair test number, explanation check and biological validation. Four of them are scored per task.
 - **Flags:** version differences, claims contradicted by the paper's own data, unverified items, notes and reviewer observations.
-- **Evidence Explorer (optional):** one self-contained HTML page that shows every model you have scored, by task and side by side. It opens offline in any browser.
+- **Evidence Explorer (optional, separate plugin):** one self-contained HTML page that shows every model you have scored, by task and side by side. It opens offline in any browser. It comes from the companion plugin [scfm-evidence-explorer](https://github.com/leahmatzat/scfm-evidence-review/tree/main/plugins/scfm-evidence-explorer), because it includes a script.
 
 ## How to use it
 
-Ask Claude to review a paper, for example: *"Review the evidence in this paper with the scfm-evidence-review skill"*, and attach the article, supplements, source data and peer review file if there is one. Claude reads the rubric, reads the files, writes `<Model>_<date>.csv` and shows a short summary. To build the explorer from all your CSVs:
+Ask Claude to review a paper, for example: *"Review the evidence in this paper with the scfm-evidence-review skill"*, and attach the article, supplements, source data and peer review file if there is one. Claude reads the rubric, reads the files, writes `<Model>_<date>.csv` and shows a short summary. For the Evidence Explorer page, install the companion plugin in Claude Code:
 
 ```
-python3 skills/scfm-evidence-review/explorer/build_explorer.py <folder>/*.csv --out evidence_explorer.html
+/plugin marketplace add leahmatzat/scfm-evidence-review
+/plugin install scfm-evidence-explorer@scfm-tools
 ```
 
 Use the strongest model available; smaller models read less of each paper and miss more.
@@ -25,9 +26,9 @@ Use the strongest model available; smaller models read less of each paper and mi
 ## What it reads, runs and sends
 
 - **Reads** the files you give it, and public web pages: the paper's code repository, model card and data pages (to check availability), and papers that evaluated the model independently.
-- **Runs** `build_explorer.py` (Python standard library only) only when you ask for the explorer. It reads your CSVs and writes one HTML file.
-- **Writes** files only in your working folder: the CSV, and the explorer page if requested.
-- **Sends** nothing anywhere else. The explorer page makes no network requests.
+- **Runs** no scripts or programs of its own. It is instructions only.
+- **Writes** files only in your working folder: one CSV per paper.
+- **Sends** nothing anywhere else.
 
 ## Licence
 
