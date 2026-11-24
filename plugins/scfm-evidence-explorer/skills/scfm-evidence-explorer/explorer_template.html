@@ -255,7 +255,7 @@ function render(){
   document.getElementById('fams').innerHTML = order.map(f =>
     `<button class="fam" aria-pressed="${f===current}" data-fam="${f}">${FAM[f]}<span class="n">${famCount[f]}</span></button>`).join('');
   const models = Object.keys(DATA).filter(m => DATA[m].t2.some(r => PER_TASK.includes(r.f) && r.t!=='all' && fam(r.t)===current));
-  document.getElementById('summary').textContent = `${models.length} of ${Object.keys(DATA).length} models in this mockup were evaluated on ${FAM[current].toLowerCase()}.`;
+  document.getElementById('summary').textContent = `${models.length} of ${Object.keys(DATA).length} models here were evaluated on ${FAM[current].toLowerCase()}.`;
   document.getElementById('models').innerHTML = models.map(m => {
     const d = DATA[m];
     const tasks = [...new Set(d.t2.filter(r=>PER_TASK.includes(r.f) && r.t!=='all' && fam(r.t)===current).map(r=>r.t.toLowerCase()))];

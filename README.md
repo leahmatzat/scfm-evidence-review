@@ -6,6 +6,10 @@ A Claude skill for reviewing the evidence in single-cell foundation model papers
 
 The rubric (v1.7) was developed on twelve published models (UCE, Geneformer, scGPT, scFoundation, CellPLM, SCimilarity, CellFM, STATE, X-Cell, GEARS, CPA, CellOT) and tested on two it was not built from (TranscriptFormer, Scouter). It measures what a paper reported, not whether its results are right.
 
+## Browse the audit
+
+The Evidence Explorer shows the scores for 14 published models, task by task, with the paper's own words behind each one: **https://leahmatzat.github.io/scfm-evidence-review/**
+
 ## Install
 
 **Claude Code**
@@ -24,6 +28,8 @@ The rubric (v1.7) was developed on twelve published models (UCE, Geneformer, scG
 |---|---|
 | `plugins/scfm-evidence-review/` | The review plugin: `SKILL.md`, the rubric and instructions. Text files only; this is the folder listed in Anthropic's directory. |
 | `plugins/scfm-evidence-explorer/` | The companion Explorer plugin: the page builder (`build_explorer.py`) and its HTML template. Install it from this repository. |
+| `data/` | The audit data: 14 models scored with rubric v1.7 (CC BY 4.0). See [`data/README.md`](data/README.md). |
+| `docs/` | The public Evidence Explorer page, served by GitHub Pages; rebuild with `python3 site/build_site.py` |
 | `.claude-plugin/marketplace.json` | Lets Claude Code install both plugins straight from this repository |
 | `CITATION.cff`, `.zenodo.json` | Citation and archive metadata |
 
@@ -35,7 +41,7 @@ The rubric version is in every CSV row (`rubric_version`). Releases follow it: `
 
 ## Corrections and suggestions
 
-Open an issue: a rubric rule that doesn't fit a paper, a score you think is wrong, or a check that should exist. Please include the paper, the column and task, and the page or figure.
+Open an issue (there is a form for corrections to the audit data): a rubric rule that doesn't fit a paper, a score you think is wrong, or a check that should exist. Please include the paper, the column and task, and the page or figure.
 
 ## Cite
 
@@ -43,4 +49,4 @@ Cite all versions with the concept DOI [10.5281/zenodo.23998812](https://doi.org
 
 ## Licence
 
-Code and skill: MIT (`LICENSE`).
+Code and skill: MIT (`LICENSE`). Audit data and the Explorer page: CC BY 4.0 (`LICENSE-DATA`).

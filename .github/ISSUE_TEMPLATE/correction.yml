@@ -1,0 +1,36 @@
+name: Suggest a correction
+description: A score, fact or pointer in the published audit data that looks wrong or incomplete.
+title: "[Correction] "
+labels: ["correction"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Model
+    validations:
+      required: true
+  - type: input
+    id: column
+    attributes:
+      label: Column or field
+      description: e.g. Simple baseline, Training-data overlap, gene_coverage
+    validations:
+      required: true
+  - type: input
+    id: task
+    attributes:
+      label: Task
+      description: The task shown in the explorer, or "all" for whole-model columns
+  - type: textarea
+    id: what
+    attributes:
+      label: What looks wrong, and what it should say
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Where in the paper
+      description: Version, section, figure or table, and page
+    validations:
+      required: true
